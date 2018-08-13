@@ -18,9 +18,10 @@ module "sonarqube" {
   cluster_instance_type  = "t2.small"
   cluster_instance_count = "1"
   tags                   = "${local.tags}"
-  parameters_key_arn     = "arn:aws:kms:eu-west-1:111122223333:key/12345678-1234-abcd-abcd-1234567890ab"
-  certificate_arn        = "arn:aws:acm:eu-west-1:111122223333:certificate/12345678-1234-abcd-abcd-1234567890ab"
-  route53_zone           = "www.example.com"
+  parameters_key_id      = "4dff4e54-82ff-4e15-a2a8-8390a7989cc2"
+  parameters_key_arn     = "arn:aws:kms:eu-west-1:951215386089:key/4dff4e54-82ff-4e15-a2a8-8390a7989cc2"
+  certificate_arn        = "arn:aws:acm:eu-west-1:951215386089:certificate/094ffda3-b8cc-43ef-9e6f-b10b38d81dce"
+  route53_zone           = "common-services-stage.telia.io"
 }
 
 output "sonarqube_URL" {

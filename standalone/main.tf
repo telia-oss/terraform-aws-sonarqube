@@ -51,16 +51,13 @@ module "ecs_cluster" {
   source              = "telia-oss/ecs/aws//modules/cluster"
   version             = "0.4.1"
   instance_ami        = "${data.aws_ami.ecs.id}"
+  instance_type       = "t2.small"
   name_prefix         = "${var.prefix}"
   vpc_id              = "${module.vpc.vpc_id}"
   subnet_ids          = ["${module.vpc.private_subnet_ids}"]
   tags                = "${var.tags}"
-  load_balancers      = "${module.loadbalancer.security_group_id}"
+  load_balancers      = ["${module.loadbalancer.security_group_id}"]
   load_balancer_count = 1
-}
-
-resource "aws_cloudwatch_log_group" "main" {
-  name = "${var.prefix}"
 }
 
 module "sonarqube-rds" {
@@ -87,10 +84,18 @@ resource "aws_ssm_parameter" "sonarqube-rds-url" {
   name      = "/${var.prefix}/rds-url"
   type      = "SecureString"
   value     = "jdbc:postgresql://${module.sonarqube-rds.endpoint}/main"
+  key_id    = "${var.parameters_key_arn}"
   overwrite = true
-
-  # tags not supported for aws_ssm_paramter
 }
+
+resource "aws_ssm_parameter" "sonarqube-base-url" {
+  name      = "/${var.prefix}/base-url"
+  type      = "SecureString"
+  value     = "https://${aws_route53_record.sonarqube.fqdn}"
+  key_id    = "${var.parameters_key_arn}"
+  overwrite = true
+}
+
 
 data "aws_ssm_parameter" "sonarqube-rds-password" {
   name = "/${var.prefix}/rds-password"
@@ -98,54 +103,54 @@ data "aws_ssm_parameter" "sonarqube-rds-password" {
 
 resource "aws_iam_role_policy_attachment" "ssmtotask" {
   policy_arn = "${aws_iam_policy.sonarqube-task-pol.arn}"
-  role       = "${aws_iam_role.task-role.name}"
-
-  # tags not supported for aws_iam_role_policy_attachment
-}
-
-resource "aws_iam_role" "task-role" {
-  name               = "${var.prefix}-task-role"
-  assume_role_policy = "${data.aws_iam_policy_document.task-role-policy.json}"
-  description        = "limited role for task"
-
-  # tags not supported for aws_iam_role
+  role       = "${module.sonarqube-service.task_role_name}"
 }
 
 module "sonarqube-service" {
-  source               = "telia-oss/ecs/aws//modules/service"
-  version              = "0.4.1"
-  cluster_id           = "${module.ecs_cluster.id}"
-  cluster_role_name    = "${module.ecs_cluster.role_id}"
+  source            = "telia-oss/ecs/aws//modules/service"
+  version           = "0.4.1"
+  cluster_id        = "${module.ecs_cluster.id}"
+  cluster_role_name = "${module.ecs_cluster.role_name}"
+
   health_check {
     port    = "traffic-port"
     path    = "/"
     matcher = "200"
   }
-  name_prefix          = "${var.prefix}"
+
+  name_prefix = "${var.prefix}"
+
   target {
     protocol      = "HTTP"
     port          = "9000"
     load_balancer = "${module.loadbalancer.arn}"
   }
-  task_container_image = "teliaoss/sonarqube-aws-env:7.2.1"
-  vpc_id               = "${module.vpc.vpc_id}"
-  tags = "${var.tags}"
+
+  task_container_image              = "teliaoss/sonarqube-aws-env:7.2.1"
+  vpc_id                            = "${module.vpc.vpc_id}"
+  tags                              = "${var.tags}"
   task_container_memory_reservation = "1000"
+
   task_container_environment = {
-    "SSM_PARAMETER_NAME_SONARQUBE_JDBC_USERNAME" = "${data.aws_ssm_parameter.sonarqube-rds-username.name}",
-    "SSM_PARAMETER_NAME_SONARQUBE_JDBC_PASSWORD" = "${data.aws_ssm_parameter.sonarqube-rds-password.name}",
-    "SSM_PARAMETER_NAME_SONARQUBE_JDBC_URL" = "${aws_ssm_parameter.sonarqube-rds-url.name}"
+    "SONARQUBE_JDBC_USERNAME" = "ssm://${data.aws_ssm_parameter.sonarqube-rds-username.name}"
+    "SONARQUBE_JDBC_PASSWORD" = "ssm://${data.aws_ssm_parameter.sonarqube-rds-password.name}"
+    "SONARQUBE_JDBC_URL"      = "ssm://${aws_ssm_parameter.sonarqube-rds-url.name}"
   }
+
   task_container_environment_count = 3
 }
 
 resource "aws_lb_listener" "main" {
   "default_action" {
     target_group_arn = "${module.sonarqube-service.target_group_arn}"
-    type = "forward"
+    type             = "forward"
   }
+
   load_balancer_arn = "${module.loadbalancer.arn}"
-  port = "443"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${var.certificate_arn}"
 }
 
 resource "aws_security_group_rule" "ingress_443" {
@@ -159,7 +164,7 @@ resource "aws_security_group_rule" "ingress_443" {
 
 resource "aws_iam_role_policy_attachment" "kmstotask" {
   policy_arn = "${aws_iam_policy.kmsfortaskpol.arn}"
-  role       = "${aws_iam_role.task-role.name}"
+  role       = "${module.sonarqube-service.task_role_name}"
 }
 
 resource "aws_security_group_rule" "sonarqube_rds_ingress" {
@@ -185,8 +190,8 @@ resource "aws_route53_record" "sonarqube" {
 }
 
 module "cluster-agent-policy" {
-  source  = "telia-oss/ssm-agent-policy/aws"
-  version = "0.1.0"
+  source      = "telia-oss/ssm-agent-policy/aws"
+  version     = "0.1.0"
   name_prefix = "${var.prefix}"
-  role   = "${module.ecs_cluster.role_id}"
+  role        = "${module.ecs_cluster.role_name}"
 }

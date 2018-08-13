@@ -1,13 +1,13 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_kms_key" "sonarqube-parameters" {
-description = "KMS key for encrypting parameters passed to sonarqube."
+  description = "KMS key for encrypting parameters passed to sonarqube."
   tags        = "${var.tags}"
 }
 
 resource "aws_kms_alias" "key-alias" {
-  name = "sonarqube-parameters"
-  target_key_id = "${aws_kms_key.sonarqube-parameters}"
+  name          = "alias/sonarqube-parameters"
+  target_key_id = "${aws_kms_key.sonarqube-parameters.id}"
 }
 
 resource "random_string" "rds_username" {
@@ -26,8 +26,6 @@ resource "aws_ssm_parameter" "rds_username" {
   type   = "SecureString"
   value  = "${random_string.rds_username.result}"
   key_id = "${aws_kms_key.sonarqube-parameters.key_id}"
-
-  # tags not supported for aws_ssm_paramter
 }
 
 resource "aws_ssm_parameter" "rds_password" {
@@ -35,10 +33,4 @@ resource "aws_ssm_parameter" "rds_password" {
   type   = "SecureString"
   value  = "${random_string.rds_password.result}"
   key_id = "${aws_kms_key.sonarqube-parameters.key_id}"
-
-  # tags not supported for aws_ssm_paramter
-}
-
-output "sonarqube_parameters_arn" {
-  value = "${aws_kms_key.sonarqube-parameters.arn}"
 }

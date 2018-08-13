@@ -19,7 +19,7 @@ variable "cluster_instance_count" {
   description = "The number of EC2 instances to have in the cluster"
 }
 
-variable "ssm_key" {
+variable "parameters_key_arn" {
   description = "The arn of the kms key used to encrypt the application parameters stored in SSM"
 }
 
