@@ -12,6 +12,7 @@ data "aws_subnet_ids" "main" {
 
 locals {
   name_prefix = "sonarqube-example"
+
   tags = {
     terraform   = "true"
     environment = "example"

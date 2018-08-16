@@ -57,7 +57,7 @@ module "ecs_cluster" {
 }
 
 module "sonarqube" {
-  source                    = "../"
+  source                    = "../../"
   name_prefix               = "${var.prefix}"
   vpc_id                    = "${module.vpc.vpc_id}"
   db_subnet_ids             = "${module.vpc.private_subnet_ids}"
@@ -98,4 +98,3 @@ module "cluster-agent-policy" {
   name_prefix = "${var.prefix}"
   role        = "${module.ecs_cluster.role_name}"
 }
-
