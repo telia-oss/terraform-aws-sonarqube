@@ -1,5 +1,5 @@
-resource "aws_iam_policy" "sonarqube-task-pol" {
-  name = "${var.name_prefix}-task-pol"
+resource "aws_iam_policy" "sonarqube-task-policy" {
+  name = "${var.name_prefix}-task-policy"
 
   policy = <<EOF
 {
@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "task-role-policy" {
   }
 }
 
-resource "aws_iam_policy" "kmsfortaskpol" {
+resource "aws_iam_policy" "kms-for-task-policy" {
   name = "kms-access-for-${var.name_prefix}"
 
   policy = <<EOF

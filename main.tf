@@ -112,12 +112,12 @@ resource "aws_ssm_parameter" "sonarqube-base-url" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssmtotask" {
-  policy_arn = "${aws_iam_policy.sonarqube-task-pol.arn}"
+  policy_arn = "${aws_iam_policy.sonarqube-task-policy.arn}"
   role       = "${module.sonarqube-service.task_role_name}"
 }
 
 resource "aws_iam_role_policy_attachment" "kmstotask" {
-  policy_arn = "${aws_iam_policy.kmsfortaskpol.arn}"
+  policy_arn = "${aws_iam_policy.kms-for-task-policy.arn}"
   role       = "${module.sonarqube-service.task_role_name}"
 }
 

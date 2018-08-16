@@ -2,7 +2,7 @@
 # Variables
 # ------------------------------------------------------------------------------
 variable "db_subnet_ids" {
-  type = "list"
+  type        = "list"
   description = "A list of IDs of the subnets to deploy the service into"
 }
 

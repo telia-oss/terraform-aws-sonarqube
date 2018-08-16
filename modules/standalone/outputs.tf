@@ -1,3 +1,3 @@
-output "sonarqube_URL" {
-  value = "${module.sonarqube.sonarqube_URL}"
+output "sonarqube_url" {
+  value = "${module.sonarqube.sonarqube_url}"
 }
