@@ -1,7 +1,3 @@
-data "aws_region" "current" {}
-
-data "aws_caller_identity" "current" {}
-
 module "vpc" {
   source               = "telia-oss/vpc/aws"
   version              = "0.2.1"
@@ -60,89 +56,23 @@ module "ecs_cluster" {
   load_balancer_count = 1
 }
 
-module "sonarqube-rds" {
-  source            = "telia-oss/rds-instance/aws"
-  version           = "0.2.0"
-  multi_az          = "false"
-  name_prefix       = "${var.prefix}"
-  username          = "${data.aws_ssm_parameter.sonarqube-rds-username.value}"
-  password          = "${data.aws_ssm_parameter.sonarqube-rds-password.value}"
-  port              = "5432"
-  engine            = "postgres"
-  instance_type     = "db.t2.small"
-  allocated_storage = "10"
-  vpc_id            = "${module.vpc.vpc_id}"
-  subnet_ids        = "${module.vpc.private_subnet_ids}"
-  tags              = "${var.tags}"
-}
-
-data "aws_ssm_parameter" "sonarqube-rds-username" {
-  name = "/${var.prefix}/rds-username"
-}
-
-resource "aws_ssm_parameter" "sonarqube-rds-url" {
-  name      = "/${var.prefix}/rds-url"
-  type      = "SecureString"
-  value     = "jdbc:postgresql://${module.sonarqube-rds.endpoint}/main"
-  key_id    = "${var.parameters_key_arn}"
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "sonarqube-base-url" {
-  name      = "/${var.prefix}/base-url"
-  type      = "SecureString"
-  value     = "https://${aws_route53_record.sonarqube.fqdn}"
-  key_id    = "${var.parameters_key_arn}"
-  overwrite = true
-}
-
-
-data "aws_ssm_parameter" "sonarqube-rds-password" {
-  name = "/${var.prefix}/rds-password"
-}
-
-resource "aws_iam_role_policy_attachment" "ssmtotask" {
-  policy_arn = "${aws_iam_policy.sonarqube-task-pol.arn}"
-  role       = "${module.sonarqube-service.task_role_name}"
-}
-
-module "sonarqube-service" {
-  source            = "telia-oss/ecs/aws//modules/service"
-  version           = "0.4.1"
-  cluster_id        = "${module.ecs_cluster.id}"
-  cluster_role_name = "${module.ecs_cluster.role_name}"
-
-  health_check {
-    port    = "traffic-port"
-    path    = "/"
-    matcher = "200"
-  }
-
-  name_prefix = "${var.prefix}"
-
-  target {
-    protocol      = "HTTP"
-    port          = "9000"
-    load_balancer = "${module.loadbalancer.arn}"
-  }
-
-  task_container_image              = "teliaoss/sonarqube-aws-env:7.2.1"
-  vpc_id                            = "${module.vpc.vpc_id}"
-  tags                              = "${var.tags}"
-  task_container_memory_reservation = "1000"
-
-  task_container_environment = {
-    "SONARQUBE_JDBC_USERNAME" = "ssm://${data.aws_ssm_parameter.sonarqube-rds-username.name}"
-    "SONARQUBE_JDBC_PASSWORD" = "ssm://${data.aws_ssm_parameter.sonarqube-rds-password.name}"
-    "SONARQUBE_JDBC_URL"      = "ssm://${aws_ssm_parameter.sonarqube-rds-url.name}"
-  }
-
-  task_container_environment_count = 3
+module "sonarqube" {
+  source                    = "../"
+  name_prefix               = "${var.prefix}"
+  vpc_id                    = "${module.vpc.vpc_id}"
+  db_subnet_ids             = "${module.vpc.private_subnet_ids}"
+  parameters_key_arn        = "${var.parameters_key_arn}"
+  loadbalancer_arn          = "${module.loadbalancer.arn}"
+  cluster_id                = "${module.ecs_cluster.id}"
+  cluster_role_name         = "${module.ecs_cluster.role_name}"
+  cluster_security_group_id = "${module.ecs_cluster.security_group_id}"
+  loadbalancer_dns_name     = "${module.loadbalancer.dns_name}"
+  route53_zone              = "${var.route53_zone}"
 }
 
 resource "aws_lb_listener" "main" {
   "default_action" {
-    target_group_arn = "${module.sonarqube-service.target_group_arn}"
+    target_group_arn = "${module.sonarqube.target_group_arn}"
     type             = "forward"
   }
 
@@ -162,36 +92,10 @@ resource "aws_security_group_rule" "ingress_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_iam_role_policy_attachment" "kmstotask" {
-  policy_arn = "${aws_iam_policy.kmsfortaskpol.arn}"
-  role       = "${module.sonarqube-service.task_role_name}"
-}
-
-resource "aws_security_group_rule" "sonarqube_rds_ingress" {
-  security_group_id        = "${module.sonarqube-rds.security_group_id}"
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = "${module.sonarqube-rds.port}"
-  to_port                  = "${module.sonarqube-rds.port}"
-  source_security_group_id = "${module.ecs_cluster.security_group_id}"
-}
-
-data "aws_route53_zone" "aws_route53_zone" {
-  name         = "${var.route53_zone}"
-  private_zone = false
-}
-
-resource "aws_route53_record" "sonarqube" {
-  zone_id = "${data.aws_route53_zone.aws_route53_zone.id}"
-  name    = "${var.prefix}.${data.aws_route53_zone.aws_route53_zone.name}"
-  type    = "CNAME"
-  ttl     = "300"
-  records = ["${module.loadbalancer.dns_name}"]
-}
-
 module "cluster-agent-policy" {
   source      = "telia-oss/ssm-agent-policy/aws"
   version     = "0.1.0"
   name_prefix = "${var.prefix}"
   role        = "${module.ecs_cluster.role_name}"
 }
+

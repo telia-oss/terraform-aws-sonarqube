@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "sonarqube-task-pol" {
-  name = "${var.prefix}-task-pol"
+  name = "${var.name_prefix}-task-pol"
 
   policy = <<EOF
 {
@@ -18,7 +18,7 @@ resource "aws_iam_policy" "sonarqube-task-pol" {
                 "ssm:GetParameters",
                 "ssm:GetParameter"
             ],
-            "Resource": "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.prefix}/*"
+            "Resource": "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.name_prefix}/*"
         },
         {
             "Sid": "",
@@ -60,7 +60,7 @@ data "aws_iam_policy_document" "task-role-policy" {
 }
 
 resource "aws_iam_policy" "kmsfortaskpol" {
-  name = "kms-access-for-${var.prefix}"
+  name = "kms-access-for-${var.name_prefix}"
 
   policy = <<EOF
 {
