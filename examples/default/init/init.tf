@@ -13,7 +13,7 @@ locals {
 
 module "sonarqube-init" {
   prefix = "sonarqube"
-  source = "../../../modules/standalone/init/"
+  source = "../../../init"
   tags   = "${local.tags}"
 }
 
