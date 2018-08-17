@@ -1,3 +1,3 @@
 ## examples/default
 
-Basic example which creates <INSERT> in the default VPC.
+Basic example which creates a Sonarqube instance in the default VPC.
