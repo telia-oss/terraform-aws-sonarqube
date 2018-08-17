@@ -1,14 +1,28 @@
 provider "aws" {
-  region = "eu-west-1"
+  version = "1.32.0"
+  region  = "eu-west-1"
 }
 
-data "aws_vpc" "main" {
-  default = true
+locals {
+  tags = {
+    terraform   = "true"
+    environment = "example"
+    application = "sonarqube"
+  }
 }
 
-data "aws_subnet_ids" "main" {
-  vpc_id = "${data.aws_vpc.main.id}"
+module "sonarqube" {
+  source                 = "../../"
+  prefix                 = "sonarqube"
+  private_subnet_count   = "2"
+  cluster_instance_type  = "t2.small"
+  cluster_instance_count = "1"
+  tags                   = "${local.tags}"
+  parameters_key_arn     = "arn:aws:kms:eu-west-1:111122223333:key/12345678-1234-1234-1234-1234567890ab"
+  certificate_arn        = "arn:aws:acm:eu-west-1:111122223333:certificate/12345678-1234-1234-1234-1234567890ab"
+  route53_zone           = "example.com"
 }
 
-# REST OF THE EXAMPLE
-
+output "sonarqube_URL" {
+  value = "${module.sonarqube.sonarqube_url}"
+}
