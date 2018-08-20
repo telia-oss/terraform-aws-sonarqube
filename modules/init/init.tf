@@ -22,14 +22,14 @@ resource "random_string" "rds_password" {
 }
 
 resource "aws_ssm_parameter" "rds_username" {
-  name   = "/${var.prefix}/rds-username"
+  name   = "/${var.name_prefix}/rds-username"
   type   = "SecureString"
   value  = "${random_string.rds_username.result}"
   key_id = "${aws_kms_key.sonarqube-parameters.key_id}"
 }
 
 resource "aws_ssm_parameter" "rds_password" {
-  name   = "/${var.prefix}/rds-password"
+  name   = "/${var.name_prefix}/rds-password"
   type   = "SecureString"
   value  = "${random_string.rds_password.result}"
   key_id = "${aws_kms_key.sonarqube-parameters.key_id}"
