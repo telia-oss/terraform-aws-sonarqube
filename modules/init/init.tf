@@ -18,7 +18,7 @@ resource "random_string" "rds_username" {
 
 resource "random_string" "rds_password" {
   length  = 16
-  special = true
+  special = false
 }
 
 resource "aws_ssm_parameter" "rds_username" {
