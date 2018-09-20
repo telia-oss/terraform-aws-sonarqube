@@ -26,12 +26,13 @@ module "sonarqube-service" {
     load_balancer = "${var.loadbalancer_arn}"
   }
 
-  task_container_image              = "teliaoss/sonarqube-aws-env:7.3"
+  task_container_image              = "teliaoss/sonarqube-aws-env:v1.0.3"
   vpc_id                            = "${var.vpc_id}"
   tags                              = "${var.tags}"
   task_container_memory_reservation = "1000"
 
   task_container_environment = {
+    "AWS_REGION"                     = "${data.aws_region.current.name}"
     "SONARQUBE_JDBC_USERNAME"        = "ssm://${data.aws_ssm_parameter.sonarqube-rds-username.name}"
     "SONARQUBE_JDBC_PASSWORD"        = "ssm://${data.aws_ssm_parameter.sonarqube-rds-password.name}"
     "SONARQUBE_JDBC_URL"             = "ssm://${aws_ssm_parameter.sonarqube-rds-url.name}"
@@ -44,7 +45,7 @@ module "sonarqube-service" {
     "SONARQUBE_ADMIN_PASSWORD"       = "ssm://${data.aws_ssm_parameter.sonarqube-admin-password.name}"
   }
 
-  task_container_environment_count = 10
+  task_container_environment_count = 11
 }
 
 module "sonarqube-rds" {
