@@ -1,0 +1,19 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: alpine
+    tag: "3.8"
+
+params:
+  directory:
+
+inputs:
+  - name: source
+
+outputs:
+  - name: secret-source
+
+run:
+  path: source/.ci/tasks/inject-secrets/task.sh

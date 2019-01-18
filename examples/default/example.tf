@@ -18,9 +18,9 @@ module "sonarqube" {
   cluster_instance_type  = "t2.small"
   cluster_instance_count = "1"
   tags                   = "${local.tags}"
-  parameters_key_arn     = "arn:aws:kms:eu-west-1:111122223333:key/12345678-1234-1234-1234-1234567890ab"
-  certificate_arn        = "arn:aws:acm:eu-west-1:111122223333:certificate/12345678-1234-1234-1234-1234567890ab"
-  route53_zone           = "example.com"
+  parameters_key_arn     = "<parameters-key-arn>"
+  certificate_arn        = "<certificate-arn>"
+  route53_zone           = "<route53-zone>"
 }
 
 output "sonarqube_URL" {
