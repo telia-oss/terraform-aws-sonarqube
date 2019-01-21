@@ -7,3 +7,4 @@ CERTIFICATE_ARN=`cat terraform-out-init/terraform-out.json | jq -r '.vpc_id.valu
 ROUTE53_ZONE=`cat terraform-out-init/terraform-out.json | jq -r '.vpc_id.value'`
 sed -i 's#<parameters-key-arn>#'${PARAMETERS_KEY_ARN}'#g' main.tf
 sed -i 's#<certificate-arn>#'${CERTIFICATE_ARN}'#g' main.tf
+sed -i 's#<route53-zone>#'${ROUTE53_ZONE}'#g' main.tf
