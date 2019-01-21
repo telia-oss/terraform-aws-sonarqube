@@ -4,7 +4,7 @@ jobs:
       - aggregate:
         - get: this-module
           trigger: true
-      - task: inject-secrets
+      - task: inject-secrets-init
         params:
           directory: default/init
           AWS_ACCOUNT_ID: ((telia-divx-common-services-stage-account-id))
