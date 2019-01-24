@@ -34,7 +34,7 @@ variable "parameters_key_arn" {
   description = "The ARN of the kms key used to encrypt the parameters"
 }
 
-variable "route53_zone" {
+variable "route53_zone_name" {
   description = "The name of the route53 zone that this service should be registered in"
 }
 

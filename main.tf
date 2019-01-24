@@ -1,7 +1,7 @@
 module "vpc" {
   source               = "telia-oss/vpc/aws"
   version              = "0.2.1"
-  name_prefix          = "${var.prefix}"
+  name_prefix          = "${var.name_prefix}"
   cidr_block           = "10.10.0.0/16"
   private_subnet_count = "${var.private_subnet_count}"
   enable_dns_hostnames = "true"
@@ -11,11 +11,18 @@ module "vpc" {
 module "loadbalancer" {
   source      = "telia-oss/loadbalancer/aws"
   version     = "0.1.1"
-  name_prefix = "${var.prefix}"
+  name_prefix = "${var.name_prefix}"
   type        = "application"
   vpc_id      = "${module.vpc.vpc_id}"
   subnet_ids  = ["${module.vpc.public_subnet_ids}"]
   tags        = "${var.tags}"
+}
+
+module "acm-certificate" {
+  source           = "telia-oss/acm-certificate/aws"
+  version          = "1.2.0"
+  hosted_zone_name = "${var.route53_zone_name}"
+  certificate_name = "${var.name_prefix}.${var.route53_zone_name}"
 }
 
 data "aws_ami" "ecs" {
@@ -48,7 +55,7 @@ module "ecs_cluster" {
   version             = "0.4.1"
   instance_ami        = "${data.aws_ami.ecs.id}"
   instance_type       = "t2.small"
-  name_prefix         = "${var.prefix}"
+  name_prefix         = "${var.name_prefix}"
   vpc_id              = "${module.vpc.vpc_id}"
   subnet_ids          = ["${module.vpc.private_subnet_ids}"]
   tags                = "${var.tags}"
@@ -58,7 +65,7 @@ module "ecs_cluster" {
 
 module "sonarqube_service" {
   source                    = "modules/sonarqube-service"
-  name_prefix               = "${var.prefix}"
+  name_prefix               = "${var.name_prefix}"
   vpc_id                    = "${module.vpc.vpc_id}"
   db_subnet_ids             = "${module.vpc.private_subnet_ids}"
   parameters_key_arn        = "${var.parameters_key_arn}"
@@ -67,7 +74,7 @@ module "sonarqube_service" {
   cluster_role_name         = "${module.ecs_cluster.role_name}"
   cluster_security_group_id = "${module.ecs_cluster.security_group_id}"
   loadbalancer_dns_name     = "${module.loadbalancer.dns_name}"
-  route53_zone              = "${var.route53_zone}"
+  route53_zone_name         = "${var.route53_zone_name}"
 }
 
 resource "aws_lb_listener" "main" {
@@ -80,7 +87,7 @@ resource "aws_lb_listener" "main" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${var.certificate_arn}"
+  certificate_arn   = "${module.acm-certificate.arn}"
 }
 
 resource "aws_security_group_rule" "ingress_443" {
@@ -95,6 +102,6 @@ resource "aws_security_group_rule" "ingress_443" {
 module "cluster-agent-policy" {
   source      = "telia-oss/ssm-agent-policy/aws"
   version     = "0.1.0"
-  name_prefix = "${var.prefix}"
+  name_prefix = "${var.name_prefix}"
   role        = "${module.ecs_cluster.role_name}"
 }
