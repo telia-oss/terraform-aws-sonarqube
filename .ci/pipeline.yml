@@ -34,7 +34,6 @@ jobs:
         params:
           directory: default
         file: this-module/.ci/tasks/inject-arns/task.yml
-        input_mapping: {source: this-module}
         output_mapping: {secret-source: source}
       - task: apply
         params:
@@ -43,7 +42,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
           AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
         file: this-module/.ci/tasks/apply/task.yml
-        input_mapping: {source: this-module}
       - task: test
         params:
           directory: default
