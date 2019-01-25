@@ -56,7 +56,7 @@ module "sonarqube" {
   cluster_role_name         = "${module.ecs_cluster.role_name}"
   cluster_security_group_id = "${module.ecs_cluster.security_group_id}"
   loadbalancer_dns_name     = "${module.loadbalancer.dns_name}"
-  route53_zone              = "${local.route53_zone}"
+  route53_zone_name         = "${local.route53_zone}"
 }
 
 resource "aws_lb_listener" "main" {

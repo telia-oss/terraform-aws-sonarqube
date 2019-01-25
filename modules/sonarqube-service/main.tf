@@ -26,7 +26,7 @@ module "sonarqube-service" {
     load_balancer = "${var.loadbalancer_arn}"
   }
 
-  task_container_image              = "teliaoss/sonarqube-aws-env:v1.0.3"
+  task_container_image              = "teliaoss/sonarqube-aws-env:v1.1.0"
   vpc_id                            = "${var.vpc_id}"
   tags                              = "${var.tags}"
   task_container_memory_reservation = "1000"
@@ -131,14 +131,14 @@ resource "aws_security_group_rule" "sonarqube_rds_ingress" {
   source_security_group_id = "${var.cluster_security_group_id}"
 }
 
-data "aws_route53_zone" "aws_route53_zone" {
-  name         = "${var.route53_zone}"
+data "aws_route53_zone" "main" {
+  name         = "${var.route53_zone_name}"
   private_zone = false
 }
 
 resource "aws_route53_record" "sonarqube" {
-  zone_id = "${data.aws_route53_zone.aws_route53_zone.id}"
-  name    = "${var.name_prefix}.${data.aws_route53_zone.aws_route53_zone.name}"
+  zone_id = "${data.aws_route53_zone.main.id}"
+  name    = "${var.name_prefix}.${data.aws_route53_zone.main.name}"
   type    = "CNAME"
   ttl     = "300"
   records = ["${var.loadbalancer_dns_name}"]
