@@ -26,7 +26,7 @@ module "sonarqube-service" {
     load_balancer = "${var.loadbalancer_arn}"
   }
 
-  task_container_image              = "teliaoss/sonarqube-aws-env:v1.1.0"
+  task_container_image              = "teliaoss/sonarqube-aws-env:v1.1.1"
   vpc_id                            = "${var.vpc_id}"
   tags                              = "${var.tags}"
   task_container_memory_reservation = "1000"

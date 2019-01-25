@@ -20,7 +20,7 @@ module "loadbalancer" {
 
 module "acm-certificate" {
   source           = "telia-oss/acm-certificate/aws"
-  version          = "1.2.1"
+  version          = "1.2.0"
   hosted_zone_name = "${var.route53_zone_name}"
   certificate_name = "${var.name_prefix}.${var.route53_zone_name}"
 }
