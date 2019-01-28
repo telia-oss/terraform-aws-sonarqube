@@ -42,6 +42,11 @@ variable "vpc_id" {
   description = "The VPC ID"
 }
 
+variable "snapshot_identifier" {
+  description = "The identifier of the snapshot to create the database from - if left empty a new db will be created"
+  default     = ""
+}
+
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
   type        = "map"

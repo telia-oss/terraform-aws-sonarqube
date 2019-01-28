@@ -49,19 +49,21 @@ module "sonarqube-service" {
 }
 
 module "sonarqube-rds" {
-  source            = "telia-oss/rds-instance/aws"
-  version           = "0.2.0"
-  multi_az          = "false"
-  name_prefix       = "${var.name_prefix}"
-  username          = "${data.aws_ssm_parameter.sonarqube-rds-username.value}"
-  password          = "${data.aws_ssm_parameter.sonarqube-rds-password.value}"
-  port              = "5432"
-  engine            = "postgres"
-  instance_type     = "db.t2.small"
-  allocated_storage = "10"
-  vpc_id            = "${var.vpc_id}"
-  subnet_ids        = "${var.db_subnet_ids}"
-  tags              = "${var.tags}"
+  source              = "telia-oss/rds-instance/aws"
+  version             = "0.6.3"
+  multi_az            = "false"
+  name_prefix         = "${var.name_prefix}"
+  username            = "${data.aws_ssm_parameter.sonarqube-rds-username.value}"
+  password            = "${data.aws_ssm_parameter.sonarqube-rds-password.value}"
+  port                = "5432"
+  engine              = "postgres"
+  instance_type       = "db.t2.small"
+  allocated_storage   = "10"
+  vpc_id              = "${var.vpc_id}"
+  subnet_ids          = "${var.db_subnet_ids}"
+  tags                = "${var.tags}"
+  skip_final_snapshot = "false"
+  snapshot_identifier = "${var.snapshot_identifier}"
 }
 
 data "aws_ssm_parameter" "sonarqube-rds-username" {
