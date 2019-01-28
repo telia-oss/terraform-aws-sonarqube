@@ -75,6 +75,7 @@ module "sonarqube_service" {
   cluster_security_group_id = "${module.ecs_cluster.security_group_id}"
   loadbalancer_dns_name     = "${module.loadbalancer.dns_name}"
   route53_zone_name         = "${var.route53_zone_name}"
+  snapshot_identifier       = "${var.snapshot_identifier}"
 }
 
 resource "aws_lb_listener" "main" {

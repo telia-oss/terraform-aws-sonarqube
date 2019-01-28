@@ -26,3 +26,8 @@ variable "parameters_key_arn" {
 variable "route53_zone_name" {
   description = "The route 53 zone into which this is deployed"
 }
+
+variable "snapshot_identifier" {
+  description = "The identifier of the snapshot to create the database from - if left empty a new db will be created"
+  default     = ""
+}
