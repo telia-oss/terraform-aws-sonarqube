@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 export DIR="${PWD}"
 cp -a ${DIR}/source/. ${DIR}/secret-source/
 cd ${DIR}/secret-source/examples/${directory}
