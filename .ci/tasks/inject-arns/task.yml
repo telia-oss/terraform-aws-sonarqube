@@ -17,4 +17,4 @@ outputs:
   - name: secret-source
 
 run:
-  path: source/.ci/tasks/inject-secrets/task.sh
+  path: source/.ci/tasks/inject-arns/task.sh
