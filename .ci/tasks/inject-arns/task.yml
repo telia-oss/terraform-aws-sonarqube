@@ -11,6 +11,7 @@ params:
 
 inputs:
   - name: source
+  - name: terraform-out-init
 
 outputs:
   - name: secret-source
