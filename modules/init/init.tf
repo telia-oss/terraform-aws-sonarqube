@@ -6,7 +6,7 @@ resource "aws_kms_key" "sonarqube-parameters" {
 }
 
 resource "aws_kms_alias" "key-alias" {
-  name          = "alias/sonarqube-parameters"
+  name          = "alias/${var.name_prefix}-parameters"
   target_key_id = "${aws_kms_key.sonarqube-parameters.id}"
 }
 
