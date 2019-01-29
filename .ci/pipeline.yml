@@ -56,6 +56,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
           AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
         file: this-module/.ci/tasks/destroy/task.yml
+      - task: clean-up
+        params:
+          directory: default
+          AWS_ACCESS_KEY_ID: ((telia-divx-common-services-stage-access-key))
+          AWS_SECRET_ACCESS_KEY: ((telia-divx-common-services-stage-secret-key))
+          AWS_SESSION_TOKEN: ((telia-divx-common-services-stage-session-token))
+        file: this-module/.ci/tasks/clean-up/task.yml
       - task: destroy-init
         params:
           directory: default/init
