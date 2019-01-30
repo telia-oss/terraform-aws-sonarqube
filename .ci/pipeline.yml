@@ -77,6 +77,6 @@ resources:
     type: git
     source:
       uri: git@github.com:telia-oss/terraform-aws-sonarqube.git
-      branch: debug-pass-on-terraform-error
+      branch: master
       private_key: ((aws-common-services-deploy-key))
 
