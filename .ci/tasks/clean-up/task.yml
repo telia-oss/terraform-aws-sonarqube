@@ -15,5 +15,6 @@ inputs:
   - name: secret-source
   - name: terraform-out
 
+
 run:
-  path: secret-source/.ci/tasks/test/task.sh
+  path: secret-source/.ci/tasks/clean-up/task.sh
