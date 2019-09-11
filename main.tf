@@ -16,7 +16,7 @@ module "loadbalancer" {
   name_prefix = var.name_prefix
   type        = "application"
   vpc_id      = module.vpc.vpc_id
-  subnet_ids  = [module.vpc.public_subnet_ids]
+  subnet_ids  = module.vpc.public_subnet_ids
   tags        = var.tags
 }
 
