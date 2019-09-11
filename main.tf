@@ -61,7 +61,7 @@ module "ecs_cluster" {
   instance_type       = var.cluster_instance_type
   name_prefix         = var.name_prefix
   vpc_id              = module.vpc.vpc_id
-  subnet_ids          = [module.vpc.private_subnet_ids]
+  subnet_ids          = module.vpc.private_subnet_ids
   tags                = var.tags
   load_balancers      = [module.loadbalancer.security_group_id]
   load_balancer_count = 1
@@ -90,7 +90,7 @@ resource "aws_lb_listener" "main" {
   }
 
   load_balancer_arn = module.loadbalancer.arn
-  port              = "443"
+  port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = module.acm-certificate.arn
@@ -100,8 +100,8 @@ resource "aws_security_group_rule" "ingress_443" {
   security_group_id = module.loadbalancer.security_group_id
   type              = "ingress"
   protocol          = "tcp"
-  from_port         = "443"
-  to_port           = "443"
+  from_port         = 443
+  to_port           = 443
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
