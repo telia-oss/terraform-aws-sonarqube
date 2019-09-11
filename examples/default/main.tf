@@ -1,5 +1,5 @@
 terraform {
-  required_version = "0.11.11"
+  required_version = ">= 0.12"
 
   backend "s3" {
     key            = "terraform-modules/development/terraform-aws-sonarqube/default.tfstate"
@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "aws" {
-  version             = "1.56.0"
+  version             = ">= 2.17"
   region              = "eu-west-1"
   allowed_account_ids = ["<test-account-id>"]
 }
@@ -32,11 +32,12 @@ module "sonarqube" {
   private_subnet_count   = "2"
   cluster_instance_type  = "t2.small"
   cluster_instance_count = "1"
-  tags                   = "${local.tags}"
+  tags                   = local.tags
   parameters_key_arn     = "<parameters-key-arn>"
   route53_zone_name      = "<route53-zone-name>"
 }
 
 output "sonarqube_URL" {
-  value = "${module.sonarqube.sonarqube_url}"
+  value = module.sonarqube.sonarqube_url
 }
+

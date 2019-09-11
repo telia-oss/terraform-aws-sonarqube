@@ -45,6 +45,7 @@ resource "aws_iam_policy" "sonarqube-task-policy" {
     ]
 }
 EOF
+
 }
 
 data "aws_iam_policy_document" "task-role-policy" {
@@ -76,4 +77,6 @@ resource "aws_iam_policy" "kms-for-task-policy" {
   ]
 }
 EOF
+
 }
+
