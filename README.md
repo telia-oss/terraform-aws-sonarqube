@@ -1,6 +1,6 @@
 ## Sonarqube
 
-[![Build Status](https://travis-ci.com/telia-oss/terraform-aws-sonarqube.svg?branch=master)](https://travis-ci.com/telia-oss/terraform-aws-sonarqube)
+[![workflow](https://github.com/telia-oss/terraform-aws-sonarqube/workflows/workflow/badge.svg)](https://github.com/telia-oss/terraform-aws-sonarqube/actions)
 
 This terraform module creates a standalone instance of Sonarqube that is preconfigured to use Github oauth.
 
