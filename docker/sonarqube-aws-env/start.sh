@@ -1,6 +1,6 @@
 #!/bin/bash
 ./post-init.sh &
-java -jar lib/sonar-application-$SONAR_VERSION.jar \
+java -jar lib/sonar-application-"$SONAR_VERSION".jar \
   -Dsonar.log.console=true \
   -Dsonar.jdbc.username="$SONARQUBE_JDBC_USERNAME" \
   -Dsonar.jdbc.password="$SONARQUBE_JDBC_PASSWORD" \
