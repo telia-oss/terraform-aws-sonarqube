@@ -49,7 +49,7 @@ module "sonarqube-service" {
 
 module "sonarqube-rds" {
   source  = "telia-oss/rds-instance/aws"
-  version = "3.0.0"
+  version = "3.1.0"
 
   multi_az            = false
   name_prefix         = var.name_prefix
@@ -121,4 +121,3 @@ resource "aws_route53_record" "sonarqube" {
   ttl     = "300"
   records = [var.loadbalancer_dns_name]
 }
-
