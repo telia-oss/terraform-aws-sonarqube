@@ -121,3 +121,4 @@ resource "aws_route53_record" "sonarqube" {
   ttl     = "300"
   records = [var.loadbalancer_dns_name]
 }
+
