@@ -49,7 +49,7 @@ module "sonarqube-service" {
 
 module "sonarqube-rds" {
   source  = "telia-oss/rds-instance/aws"
-  version = "3.0.0"
+  version = "3.1.0"
 
   multi_az            = false
   name_prefix         = var.name_prefix
