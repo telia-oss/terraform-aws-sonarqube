@@ -14,7 +14,7 @@ module "sonarqube-service" {
   vpc_id                            = var.vpc_id
   cluster_id                        = var.cluster_id
   cluster_role_name                 = var.cluster_role_name
-  task_container_image              = "teliaoss/sonarqube-aws-env:v1.2.2"
+  task_container_image              = "teliaoss/sonarqube-aws-env:v2.1.0"
   task_container_memory_reservation = 900
   task_container_environment_count  = 11
 
