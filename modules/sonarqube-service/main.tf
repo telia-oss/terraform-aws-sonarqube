@@ -8,7 +8,8 @@ data "aws_caller_identity" "current" {}
 
 module "sonarqube-service" {
   source  = "telia-oss/ecs/aws//modules/service"
-  version = "2.0.0"
+  version = "3.0.0-alpha.3"
+
 
   name_prefix                       = var.name_prefix
   vpc_id                            = var.vpc_id
@@ -16,7 +17,7 @@ module "sonarqube-service" {
   cluster_role_name                 = var.cluster_role_name
   task_container_image              = "teliaoss/sonarqube-aws-env:v2.1.0"
   task_container_memory_reservation = 900
-  task_container_environment_count  = 11
+  #task_container_environment_count  = 11
 
   health_check = {
     port    = "traffic-port"
@@ -49,7 +50,7 @@ module "sonarqube-service" {
 
 module "sonarqube-rds" {
   source  = "telia-oss/rds-instance/aws"
-  version = "3.1.0"
+  version = "4.0.0"
 
   multi_az            = false
   name_prefix         = var.name_prefix

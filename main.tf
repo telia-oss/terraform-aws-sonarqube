@@ -1,13 +1,22 @@
 module "vpc" {
   source  = "telia-oss/vpc/aws"
-  version = "0.2.1"
+  version = "4.1.0"
 
-  name_prefix          = var.name_prefix
-  cidr_block           = "10.10.0.0/16"
-  private_subnet_count = var.private_subnet_count
+  name_prefix = var.name_prefix
+  cidr_block  = "10.10.0.0/16"
+  public_subnet_cidrs = [
+    "10.10.0.0/20",
+    "10.10.16.0/20",
+    "10.10.32.0/20",
+  ]
+  private_subnet_cidrs = [
+    "10.10.48.0/20",
+    "10.10.64.0/20",
+  ]
   enable_dns_hostnames = true
   tags                 = var.tags
 }
+
 
 module "loadbalancer" {
   source  = "telia-oss/loadbalancer/aws"
@@ -55,7 +64,7 @@ data "aws_ami" "ecs" {
 
 module "ecs_cluster" {
   source  = "telia-oss/ecs/aws//modules/cluster"
-  version = "2.0.0"
+  version = "3.0.0-alpha.3"
 
   instance_ami        = data.aws_ami.ecs.id
   instance_type       = var.cluster_instance_type
@@ -107,7 +116,7 @@ resource "aws_security_group_rule" "ingress_443" {
 
 module "cluster-agent-policy" {
   source  = "telia-oss/ssm-agent-policy/aws"
-  version = "3.0.0"
+  version = "4.0.0"
 
   name_prefix = var.name_prefix
   role        = module.ecs_cluster.role_name

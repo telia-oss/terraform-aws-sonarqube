@@ -1,6 +1,5 @@
 provider "aws" {
-  version = ">= 2.17"
-  region  = "eu-west-1"
+  region = "eu-west-1"
 }
 
 data "aws_vpc" "main" {
@@ -25,13 +24,13 @@ locals {
 
 module "ecs_cluster" {
   source  = "telia-oss/ecs/aws//modules/cluster"
-  version = "2.0.0"
+  version = "3.0.0-alpha.3"
 
   instance_ami        = "ami-0af844a965e5738db"
   instance_type       = "t2.small"
   name_prefix         = local.name_prefix
   vpc_id              = data.aws_vpc.main.id
-  subnet_ids          = [data.aws_subnet_ids.main.ids]
+  subnet_ids          = data.aws_subnet_ids.main.ids
   tags                = local.tags
   load_balancers      = [module.loadbalancer.security_group_id]
   load_balancer_count = 1
@@ -44,7 +43,7 @@ module "loadbalancer" {
   name_prefix = local.name_prefix
   type        = "application"
   vpc_id      = data.aws_vpc.main.id
-  subnet_ids  = [data.aws_subnet_ids.main.ids]
+  subnet_ids  = data.aws_subnet_ids.main.ids
   tags        = local.tags
 }
 
