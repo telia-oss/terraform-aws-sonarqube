@@ -1,6 +1,5 @@
 provider "aws" {
-  version = ">= 2.17"
-  region  = "eu-west-1"
+  region = "eu-west-1"
 }
 
 data "aws_vpc" "main" {
@@ -13,8 +12,8 @@ data "aws_subnet_ids" "main" {
 
 locals {
   name_prefix     = "sonarqube-example"
-  route53_zone    = "example.com"
-  certificate_arn = "<ssl-certificate-arn>"
+  route53_zone    = "<route53_zone>"
+  certificate_arn = "<certificate_arn>"
 
   tags = {
     terraform   = "true"
@@ -25,13 +24,13 @@ locals {
 
 module "ecs_cluster" {
   source  = "telia-oss/ecs/aws//modules/cluster"
-  version = "2.0.0"
+  version = "3.0.0-alpha.3"
 
-  instance_ami        = "ami-0af844a965e5738db"
+  instance_ami        = "ami-0ffea00000f287d30"
   instance_type       = "t2.small"
   name_prefix         = local.name_prefix
   vpc_id              = data.aws_vpc.main.id
-  subnet_ids          = [data.aws_subnet_ids.main.ids]
+  subnet_ids          = data.aws_subnet_ids.main.ids
   tags                = local.tags
   load_balancers      = [module.loadbalancer.security_group_id]
   load_balancer_count = 1
@@ -39,12 +38,12 @@ module "ecs_cluster" {
 
 module "loadbalancer" {
   source  = "telia-oss/loadbalancer/aws"
-  version = "3.0.0"
+  version = "4.0.0"
 
   name_prefix = local.name_prefix
   type        = "application"
   vpc_id      = data.aws_vpc.main.id
-  subnet_ids  = [data.aws_subnet_ids.main.ids]
+  subnet_ids  = data.aws_subnet_ids.main.ids
   tags        = local.tags
 }
 
@@ -60,6 +59,13 @@ module "sonarqube" {
   cluster_security_group_id = module.ecs_cluster.security_group_id
   loadbalancer_dns_name     = module.loadbalancer.dns_name
   route53_zone_name         = local.route53_zone
+
+  ##This is added to force Terraform to create the parameters before deploying Sonarqube
+  ##This is for the example only don't do this in production
+  depends_on = [
+    aws_ssm_parameter.sonarqube_rds_username,
+    aws_ssm_parameter.sonarqube_rds_password
+  ]
 }
 
 resource "aws_lb_listener" "main" {
@@ -95,14 +101,14 @@ resource "aws_kms_alias" "key-alias" {
 }
 
 #Passwords set and storted in repo for example only (don't do it this way!)
-resource "aws_ssm_parameter" "rds_username" {
+resource "aws_ssm_parameter" "sonarqube_rds_username" {
   name   = "/${local.name_prefix}/rds-username"
   type   = "SecureString"
   value  = "username"
   key_id = aws_kms_key.sonarqube-parameters.key_id
 }
 
-resource "aws_ssm_parameter" "rds_password" {
+resource "aws_ssm_parameter" "sonarqube_rds_password" {
   name   = "/${local.name_prefix}/rds-password"
   type   = "SecureString"
   value  = "notsogoodpassword"
@@ -117,7 +123,7 @@ resource "aws_ssm_parameter" "admin_username" {
 }
 
 resource "aws_ssm_parameter" "admin_password" {
-  name   = "/${local.name_prefix}/admin-username"
+  name   = "/${local.name_prefix}/admin-password"
   type   = "SecureString"
   value  = "anotherbadpassword"
   key_id = aws_kms_key.sonarqube-parameters.key_id

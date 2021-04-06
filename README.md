@@ -22,14 +22,14 @@ To get a working Sonarqube installation up and running complete the following st
     replace the value for route53_zone with the name of your route53 hosted zone
 4. create the following ssm parameters in your AWS account and encrypt them using the key create above.
 
-| ssm parameter name| description |
+| ssm parameter name| description of value |
 |--- |--- |
-|  \<name_prefix\>/github-auth-enabled |set to true|
-|  \<name_prefix\>/github-client-id | obtained from github|
-|  \<name_prefix\>/github-client-secret |obtained from github|
-|  \<name_prefix\>/github-organizations |github organisation for ouath|
-|  \<name_prefix\>/admin-username |may only contain url safe chars|
-|  \<name_prefix\>/admin-password |may only contain url safe chars|
+|  /<name_prefix\>/github-auth-enabled |set to true|
+|  /<name_prefix\>/github-client-id | obtained from github|
+|  /<name_prefix\>/github-client-secret |obtained from github|
+|  /<name_prefix\>/github-organizations |github organisation for ouath|
+|  /<name_prefix\>/admin-username |may only contain url safe chars|
+|  /<name_prefix\>/admin-password |may only contain url safe chars|
 
 5. run terraform apply
 

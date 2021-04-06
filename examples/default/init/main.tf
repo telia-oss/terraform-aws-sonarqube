@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.14"
 
   backend "s3" {
     key            = "terraform-modules/development/terraform-aws-sonarqube/default-init.tfstate"
@@ -13,7 +13,6 @@ terraform {
 }
 
 provider "aws" {
-  version             = ">= 2.17"
   region              = "eu-west-1"
   allowed_account_ids = ["<test-account-id>"]
 }
@@ -93,3 +92,6 @@ output "parameters_key_arn" {
   value = module.sonarqube-init.parameters_key_arn
 }
 
+output "parameters_key_alias" {
+  value = module.sonarqube-init.parameters_key_alias
+}

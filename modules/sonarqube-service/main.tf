@@ -8,7 +8,8 @@ data "aws_caller_identity" "current" {}
 
 module "sonarqube-service" {
   source  = "telia-oss/ecs/aws//modules/service"
-  version = "2.0.0"
+  version = "3.0.0-alpha.3"
+
 
   name_prefix                       = var.name_prefix
   vpc_id                            = var.vpc_id
@@ -16,7 +17,7 @@ module "sonarqube-service" {
   cluster_role_name                 = var.cluster_role_name
   task_container_image              = "teliaoss/sonarqube-aws-env:v2.1.0"
   task_container_memory_reservation = 900
-  task_container_environment_count  = 11
+
 
   health_check = {
     port    = "traffic-port"
@@ -32,8 +33,8 @@ module "sonarqube-service" {
 
   task_container_environment = {
     "AWS_REGION"                     = data.aws_region.current.name
-    "SONARQUBE_JDBC_USERNAME"        = "ssm://${data.aws_ssm_parameter.sonarqube-rds-username.name}"
-    "SONARQUBE_JDBC_PASSWORD"        = "ssm://${data.aws_ssm_parameter.sonarqube-rds-password.name}"
+    "SONARQUBE_JDBC_USERNAME"        = "ssm://${data.aws_ssm_parameter.sonarqube_rds_username.name}"
+    "SONARQUBE_JDBC_PASSWORD"        = "ssm://${data.aws_ssm_parameter.sonarqube_rds_password.name}"
     "SONARQUBE_JDBC_URL"             = "ssm://${aws_ssm_parameter.sonarqube-rds-url.name}"
     "SONARQUBE_BASE_URL"             = "ssm://${aws_ssm_parameter.sonarqube-base-url.name}"
     "SONARQUBE_GITHUB_AUTH_ENABLED"  = "ssm:///${var.name_prefix}/github-auth-enabled"
@@ -49,12 +50,12 @@ module "sonarqube-service" {
 
 module "sonarqube-rds" {
   source  = "telia-oss/rds-instance/aws"
-  version = "3.1.0"
+  version = "4.0.0"
 
   multi_az            = false
   name_prefix         = var.name_prefix
-  username            = data.aws_ssm_parameter.sonarqube-rds-username.value
-  password            = data.aws_ssm_parameter.sonarqube-rds-password.value
+  username            = data.aws_ssm_parameter.sonarqube_rds_username.value
+  password            = data.aws_ssm_parameter.sonarqube_rds_password.value
   port                = 5432
   engine              = "postgres"
   instance_type       = "db.t2.small"
@@ -66,11 +67,11 @@ module "sonarqube-rds" {
   snapshot_identifier = var.snapshot_identifier
 }
 
-data "aws_ssm_parameter" "sonarqube-rds-username" {
+data "aws_ssm_parameter" "sonarqube_rds_username" {
   name = "/${var.name_prefix}/rds-username"
 }
 
-data "aws_ssm_parameter" "sonarqube-rds-password" {
+data "aws_ssm_parameter" "sonarqube_rds_password" {
   name = "/${var.name_prefix}/rds-password"
 }
 
