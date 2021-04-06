@@ -20,7 +20,7 @@ module "vpc" {
 
 module "loadbalancer" {
   source  = "telia-oss/loadbalancer/aws"
-  version = "3.0.0"
+  version = "4.0.0"
 
   name_prefix = var.name_prefix
   type        = "application"
